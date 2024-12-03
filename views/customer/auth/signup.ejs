@@ -1,0 +1,50 @@
+<%- include("../../shared/partials/head", { pageTitle: "Signup" }) %>
+</head>
+<body>
+    <%- include("../../shared/partials/header") %>
+
+    <main>
+        <% if (success_msg) { %>
+            <p style="color: green;"><%= success_msg %></p>
+        <% } %>
+        <% if (error_msg) { %>
+            <p style="color: red;"><%= error_msg %></p>
+        <% } %>
+        <h1>Create a new account</h1>
+        <form action="/signup" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <p>
+                <label for="email">E-mail</label>
+                <input type="email" name="email" id="email" value="<%= locals.details && locals.details.email %>" required>
+            </p>
+            <p>
+                <label for="confirmEmail">Confirm E-mail</label>
+                <input type="email" name="confirmEmail" id="confirmEmail" value="<%= locals.details && locals.details.confirmEmail %>" required>
+            </p>
+            <p>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" value="<%= locals.details && locals.details.password %>" minlength="8" required>
+            </p>
+            <hr />
+            <p>
+                <label for="fullname">Full Name</label>
+                <input type="text" name="fullname" id="fullname" value="<%= locals.details && locals.details.fullname %>" required>
+            </p>
+            <p>
+                <label for="street">Street</label>
+                <input type="text" name="street" id="street" value="<%= locals.details && locals.details.street %>" required>
+            </p>
+            <p>
+                <label for="pincode">Pincode</label>
+                <input type="text" name="pincode" id="pincode" minlength="6" maxlength="6" value="<%= locals.details && locals.details.pincode %>" required>
+            </p>
+            <p>
+                <label for="city">City</label>
+                <input type="text" name="city" id="city" value="<%= locals.details && locals.details.city %>" required>
+            </p>
+            <button id="btn">Create Account</button>
+            <p id="switch-form"><a href="/login">Login Instead</a></p>
+        </form>
+    </main>
+
+<%- include("../../shared/partials/footer") %>

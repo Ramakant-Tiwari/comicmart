@@ -1,0 +1,43 @@
+<%- include("../../shared/partials/head", {pageTitle: product.title}) %>
+</head>
+<body>
+    <%- include("../../shared/partials/header") %>
+
+    <main>
+        <img src="<%= product.imageUrl  %>" alt="<%= product.title  %>" style="max-width: 50%; height: auto;">
+        <h2><%= product.title  %></h2>
+        <p>Rs <%= product.price %></p>
+        <% if (!locals.isAdmin)  {%>
+        <button id="add-to-cart" data-productid="<%= product._id %>" data-csrf="<%= locals.csrfToken %>">Add to Cart</button>
+        <% } %>
+        <script defer>
+            const addToCart = document.getElementById("add-to-cart");
+            const badge = document.getElementById("badge");
+            addToCart.addEventListener("click", async function() {
+                try {
+                    console.log(addToCart.dataset.productid);
+                    const response = await fetch(`/cart/items?_csrf=${addToCart.dataset.csrf}`, {
+                      method: "POST",
+                      body: JSON.stringify({ productid: addToCart.dataset.productid }),
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                    });
+                  
+                    if (!response.ok) {
+                      // Check for specific status codes and provide custom messages if needed
+                      alert(response.statusText);
+                      return;
+                    }
+                    const responseData = await response.json();
+                    badge.textContent = responseData.newTotalItems;
+                  } catch (error) {
+                    console.error("Error adding item to cart:", error);
+                    alert("Network error! Please check your internet connection and try again.");
+                  }                  
+            })
+        </script>
+        <p><%= product.description  %></p>
+    </main>
+
+<%- include("../../shared/partials/footer") %>

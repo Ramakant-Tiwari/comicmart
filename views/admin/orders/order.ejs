@@ -1,0 +1,80 @@
+<%- include("../../shared/partials/head", {pageTitle: "Order"}) %>
+</head>
+<body>
+    <%- include("../../shared/partials/header") %>
+
+    <main>
+        <h1>Your Orders</h1>
+        <ul>
+            <% for(const userOrder of userOrders) { %>
+                <% for (const productsData of userOrder.productsData) { %>
+                  <li>
+                    <img src="<%= productsData.product.imageUrl  %>" alt="<%= productsData.product.title  %>" style="max-height: 10vh; width: auto;">
+                    <p>Title: <%= productsData.product.title %></p>
+                    <p>Product quantity: <%= productsData.quantity  %></p>
+                    <p>Product total price: <%= productsData.totalPrice %></p>
+                    <% if(productsData.status !== "pending") { %> 
+                        <select disabled><option value="<%= productsData.status  %>" selected><%= productsData.status  %></option></select>
+                    <% } else { %>
+                    <form class="status-form">
+                        <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+                        <input type="hidden" name="orderid" value="<%= userOrder._id  %>">
+                        <input type="hidden" name="productid" value="<%= productsData.product._id  %>">
+                        <select name="status">
+                            <% for (const availStatus of ["pending", "canceled", "fulfilled"]) {%>
+                                <% if(productsData.status === availStatus) {%>
+                                    <option value="<%= productsData.status %>" selected><%= productsData.status %></option>
+                                <% } else { %>
+                                    <option value="<%= availStatus%>"><%= availStatus %></option>
+                                <% } %>
+                                <% } %>
+                        </select>
+                    </form>
+                    <% } %>
+                  </li>
+                  <br>
+            <% } }  %>
+        </ul>
+
+    <%- include("../../shared/partials/footer") %>
+
+    <script defer>
+        const selects = document.querySelectorAll("select");
+        for (const select of selects) {
+            select.addEventListener("change", async function(e) {
+                const form = select.closest("form");  // Get the closest form
+                const formData = new FormData(form);  // Collect form data
+                const data = {};
+
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+
+                // Skip if the selected value is "pending"
+                if (select.value === "pending") return;
+
+                try {
+                    const response = await fetch("/admin/orders", {
+                        method: "POST",
+                        body: JSON.stringify(data),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log("Status updated:", result);
+                        
+                        // Disable the select element and update the status text
+                        window.location.reload();
+                    } else {
+                        throw new Error("Failed to update order status");
+                    }
+                } catch(error) {
+                    console.error("Error:", error);
+                    alert("An error occurred while updating the order status.");
+                }
+            });
+        }
+    </script>

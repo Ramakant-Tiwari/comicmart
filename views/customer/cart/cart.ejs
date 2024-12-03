@@ -1,0 +1,72 @@
+<%- include("../../shared/partials/head", {pageTitle: "Cart"}) %>
+</head>
+<body>
+    <%- include("../../shared/partials/header") %>
+
+    <main>
+        <h1>Your cart</h1>
+        <ul>
+            <% for (const item of cart.items) {%>
+            <li>
+                <h2><%= item.product.title %> </h2>
+                <p id="item-price" data-productprice="<%= item.product.price %>">Total Price(for this product): Rs <%= item.totalPrice %> (Rs <%= item.product.price %>)</p>
+                <form data-productid="<%= item.product._id %>" data-csrf="<%= locals.csrfToken %>" class="form">
+                    <input type="number" value="<%= item.quantity %>" required>
+                    <button>Update</button>
+                </form>
+            </li>
+            <% } %>
+        </ul>
+        <p id="cart-total-Price">Total: Rs <%= cart.totalPrice %></p>
+        <% if(locals.isAuth) {%>
+        <form action="/orders" method="POST">
+            <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+            <button>Buy Product</button>
+        </form>
+        <% } else {%>
+            <p>Login first to proceed</p>
+        <% } %>
+    </main>
+
+    <script defer>
+        const updateForms = document.querySelectorAll(".form");
+
+        for(const updateForm of updateForms) {
+            updateForm.addEventListener("submit", async function(e) {
+                e.preventDefault();
+                try {
+                    console.log(updateForm.dataset.productid);
+                    const response = await fetch(`/cart/items?_csrf=${updateForm.dataset.csrf}`, {
+                      method: "PATCH",
+                      body: JSON.stringify({ productid: updateForm.dataset.productid, newQuantity:  updateForm.firstElementChild.value}),
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                    });
+                  
+                    if (!response.ok) {
+                      // Check for specific status codes and provide custom messages if needed
+                      alert(response.statusText);
+                      return;
+                    }
+                    const responseData = await response.json();
+                    const updatedCartData = responseData.updatedCartData;
+                    console.log(responseData);
+                    if (updatedCartData.newTotalQuantity === 0) {
+                        updateForm.parentElement.remove();
+                    } else {
+                        const itemPrice = document.getElementById("item-price")
+                        itemPrice.textContent = `Total Price(for this product): Rs  ${updatedCartData.newItemTotalPrice}(Rs  ${itemPrice.dataset.productprice})`;
+                    }
+                    document.getElementById("cart-total-Price").textContent = "Total: Rs " + updatedCartData.newTotalPrice;
+                    document.getElementById("badge").textContent = updatedCartData.newTotalQuantity;
+                  } catch (error) {
+                    console.error("Error adding item to cart:", error);
+                    alert("Network error! Please check your internet connection and try again.");
+                  }                 
+            })
+        }
+
+    </script>
+
+<%- include("../../shared/partials/footer") %>

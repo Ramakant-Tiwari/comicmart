@@ -1,0 +1,23 @@
+<%- include("../../shared/partials/head", {pageTitle: "All Products"}) %>
+</head>
+<body>
+    <%- include("../../shared/partials/header") %>
+
+    <main>
+        <h1>All products (Admin)</h1>
+        <p><a href="/admin/products/new">Add new product</a></p>
+        <ul>
+            <% for (const product of products) { %>
+                <li>
+                    <img src="<%= product.imageUrl  %>" alt="<%= product.title  %>" style="max-width: 30%; height: auto;">
+                     <h2><%= product.title  %></h2>
+                     <div>
+                        <a href="/admin/product/<%= product._id %>">View and Edit</a>
+                        <form action="/admin/product/<%= product._id %>/delete?_csrf=<%= locals.csrfToken  %>" method="POST"><button>Delete</button></form>
+                     </div>
+                </li>
+                <% } %>
+        </ul>
+    </main>
+
+<%- include("../../shared/partials/footer") %>

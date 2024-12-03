@@ -1,0 +1,30 @@
+<%- include("../../shared/partials/head", {pageTitle: "Login"}) %>
+</head>
+<body>
+    <%- include("../../shared/partials/header") %>
+
+    <main>
+        <% if (locals.success_msg) { %>
+            <p style="color: green;"><%= success_msg %></p>
+          <% } %>
+          <% if (locals.error_msg) { %>
+            <p style="color: red;"><%= error_msg %></p>
+          <% } %>
+        <h1>Login to your account</h1>
+        <form action="/login" method="POST">
+            <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+            <p>
+                <label for="email">E-mail</label>
+                <input type="email" name="email" id="email" required>
+            </p>
+
+            <p>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" minlength="8" required>
+            </p>
+            <button id="btn">Login</button>
+            <p id="switch-form"><a href="/signup">Signup Instead</a></p>
+        </form>
+    </main>
+
+<%- include("../../shared/partials/footer") %>

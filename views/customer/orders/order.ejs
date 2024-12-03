@@ -1,0 +1,22 @@
+<%- include("../../shared/partials/head", {pageTitle: "Order"}) %>
+</head>
+<body>
+    <%- include("../../shared/partials/header") %>
+
+    <main>
+        <h1>Your Orders</h1>
+        <ul>
+            <% for(const userOrder of userOrders) { %>
+                <% for (const productsData of userOrder.productsData) { %>
+                  <li>
+                    <img src="<%= productsData.product.imageUrl  %>" alt="<%= productsData.product.title  %>" style="max-height: 10vh; width: auto;">
+                    <p>Title: <%= productsData.product.title %></p>
+                    <p>Product quantity: <%= productsData.quantity  %></p>
+                    <p>Product total price: <%= productsData.totalPrice %></p>
+                    <select disabled><option value="<%= productsData.status  %>" selected><%= productsData.status  %></option></select>
+                  </li>
+                  <br>
+            <% } } %>
+        </ul>
+
+    <%- include("../../shared/partials/footer") %>

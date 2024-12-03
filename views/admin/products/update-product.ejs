@@ -1,0 +1,51 @@
+<%- include("../../shared/partials/head", { pageTitle: "Update Product" }) %>
+</head>
+<body>
+    <%- include("../../shared/partials/header") %>
+
+    <main>
+        <h1>Update Products</h1>
+        <form action="/admin/product/<%= product._id %>?_csrf=<%= locals.csrfToken %>" method="POST" enctype="multipart/form-data">
+            <p>
+                <label for="title">Title</label>
+                <input type="text" name="title" id="title" value="<%= product.title %>" required>
+            </p>
+
+            <p>
+                <label for="image">Image</label>
+                <input type="file" name="image" id="image" accept="image/png, image/jpg" required>
+                <img src="<%= product.imageUrl  %>" alt="<%= product.title  %>" style="max-height: 5vh; width: auto;" id="image-preview">
+                <script defer>
+                    const filePicker = document.getElementById("image");
+                    const filePreview = document.getElementById("image-preview");
+                    filePicker.addEventListener("change", function() {
+                        const file = filePicker.files;
+                        if (!file || file.length === 0) return;
+                        filePreview.src = URL.createObjectURL(file[0]);
+                    });
+                </script>
+            </p>
+
+            <p>
+                <label for="summary">Summary</label>
+                <input type="text" name="summary" id="summary" maxlength="250" value="<%= product.summary %>" required>
+            </p>
+
+            <p>
+                <label for="price">Price</label>
+                <input type="number" id="price" name="price" min="1" step="1" value="<%= product.price %>" required>
+            </p> 
+
+            <p>
+                <label for="description">Description</label>
+                <textarea name="description" id="description" rows="7" required><%= product.description %></textarea>
+            </p>
+            <p>
+                <button type="reset">Reset</button>
+                <button type="submit">Submit</button>
+            </p>
+        </form>
+    </main>
+
+    <%- include("../../shared/partials/footer") %>
+
